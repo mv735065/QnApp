@@ -1,0 +1,43 @@
+{% extends "base_generic.html" %}
+{% load static %}
+{% load custom_tags %}
+
+{% block content %}
+  <div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-md rounded-lg">
+    <h1 class="text-2xl font-bold mb-6">
+      {% if answer_pk %}
+        Comment on Answer
+      {% else %}
+        Comment on Question
+      {% endif %}
+    </h1>
+    <form method="post">
+      {% csrf_token %}
+      <!-- Display form errors -->
+      {% if form.errors %}
+        <div class="mb-4">
+          <ul class="text-red-600 list-disc list-inside">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      <div class="mb-4">
+        <label for="id_content" class="block text-gray-700 text-sm font-bold mb-2">Content</label>
+        {{ form.content|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+        <p class="text-gray-600 text-xs italic mt-1">{{ form.content.help_text }}</p>
+      </div>
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Submit Comment
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

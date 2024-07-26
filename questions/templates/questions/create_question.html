@@ -1,0 +1,61 @@
+{% extends "base_generic.html" %}
+{% load custom_tags %}
+
+{% block content %}
+  <div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-md rounded-lg">
+    <h1 class="text-3xl font-bold mb-6">Ask a Question</h1>
+    <form method="post">
+      {% csrf_token %}
+      <!-- Display form errors -->
+      {% if form.errors %}
+        <div class="mb-4">
+          <ul class="text-red-600">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      <div class="mb-4">
+        <label for="id_title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
+        {{ form.title|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+      </div>
+      <div class="mb-4">
+        <label for="id_description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+        {{ form.description|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+      </div>
+      <div class="mb-4">
+        <label for="id_tags" class="block text-gray-700 text-sm font-bold mb-2">Tags</label>
+        <div class="space-y-2">
+          {% for tag in form.tags.field.queryset %}
+            <div class="flex items-center">
+              <input type="checkbox" id="id_tags_{{ tag.id }}" name="tags" value="{{ tag.id }}" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
+              <label for="id_tags_{{ tag.id }}" class="ml-2 text-gray-700 text-sm">{{ tag.name }}</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="id_title" class="block text-gray-700 text-sm font-bold mb-2">Created at</label>
+        {{ form.created_at|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+      </div>
+      
+
+      <div class="mb-4">
+        <label for="id_new_tags" class="block text-gray-700 text-sm font-bold mb-2">New Tags</label>
+        {{ form.new_tags|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
+        <p class="text-gray-600 text-xs italic">{{ form.new_tags.help_text }}</p>
+      </div>
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

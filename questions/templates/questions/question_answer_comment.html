@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+{% block title %}{{ question.title }}{% endblock %}
+{% block content %}
+<h1></h1>
+<h2>Question: {{ question.title }}</h2>
+<h2>Answer:{{answer.description}}</h2>
+<h3> Comments:</h3>
+ <ul>
+   
+                    {% for comment in comments %}
+                        <li>
+                            <p>{{ comment.content }} - {{ comment.user.username }} on {{ comment.created_at }}</p>
+                            
+                        </li>
+                        <span><a href="{% url 'like_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Upvote</a> {{ comment.total_likes }}
+                            <a href="{% url 'unlike_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Downvote</a>{{ comment.total_unlikes }}
+                            {% if request.user == comment.user %}
+                    <a href="{% url 'edit_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Edit_Comment</a>
+                    <a href="{% url 'delete_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Delete_Comment</a>
+                {% endif %}
+                        </span>
+                    {% endfor %}
+                </ul>
+
+    <a href="{% url 'create_comment_answer' question.pk  answer.pk %}"> <button type="submit">Add Comment</button></a>
+
+{% endblock %}
