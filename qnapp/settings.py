@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'qnapp.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgresql://postgres.tvcgubhiklwedtrdapoe:Va9640971503@@aws-0-us-east-1.pooler.supabase.com:6543/postgres')
+    'default': dj_database_url.config(default='postgres://default:************@ep-spring-cloud-a4eqch22.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require')
 }
 
 
