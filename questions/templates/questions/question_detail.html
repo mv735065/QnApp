@@ -103,13 +103,14 @@
                 <div>
                     <a href="{% url 'like_answer' answer.question.pk answer.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ answer.total_likes }}
                     <span class="mx-2">|</span>
-                    <a href="{% url 'unlike_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ answer.total_unlikes }}
+                    <a href="{% url 'unlike_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ answer.total_unlikes }}<span class="mx-2">|</span>
+                    <a href="{% url 'question_answer_comment' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Comments</a><span class="mx-2">|</span>
+                    <a href="{% url 'create_comment_answer' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Add Comment</a><span class="mx-2">|</span>
                 </div>
                 <div class="dropdown">
                     <span class="dropbtn">⋮</span>
                     <div class="dropdown-content">
-                        <a href="{% url 'question_answer_comment' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Comments</a>
-                        <a href="{% url 'create_comment_answer' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Add Comment</a>
+                       
                         {% if request.user == answer.user %}
                         <a href="{% url 'edit_answer' answer.question.pk answer.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
                         <a href="{% url 'delete_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>

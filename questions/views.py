@@ -11,12 +11,23 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 from django.http import *
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 def root_view(request):
-    return redirect('question_list')
+    return redirect('home')
 
 def home(request):
-    return render(request, 'questions/home.html')
+    questions = Question.objects.all()
+    paginator = Paginator(questions, 5)  # Show 5 questions per page
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+    }
+    
+    return render(request, 'questions/home.html', context)
 
 def searchbar(request):
     search_query = request.GET.get('search', '')  # Search query
@@ -223,10 +234,11 @@ def create_comment_answer(request, question_pk, answer_pk=None, parent_pk=None):
     else:
         form = CommentForm()
     return render(request, 'questions/create_comment.html', {
-        'form': form,
-        'question': question,
-        'parent_comment': parent_comment
-    })
+    'form': form,
+    'question': question,
+    'answer': related_object,
+    'answer_id': related_object.id if related_object else None,
+})
 
 @login_required
 def like_question(request, question_pk):

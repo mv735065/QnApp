@@ -1,1 +1,48 @@
 {% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container mx-auto mt-10">
+    <h1 class="text-3xl mb-5">Questions</h1>
+    <div class="grid grid-cols-4 gap-4">
+        <div class="col-span-1">
+            <form method="get">
+                <!-- Your filter form here -->
+            </form>
+        </div>
+        <div class="col-span-3">
+            <ul>
+                {% for question in page_obj %}
+                    <li class="border rounded-md p-4 mb-4 bg-white shadow-md">
+                        <h2 class="text-xl font-bold"><a href="{% url 'question_detail' question.pk %}">{{ question.title }}</a></h2>
+                        <p>{{ question.description }}</p>
+                        <div class="mt-2">
+                            <h3 class="text-lg font-semibold">Answer:</h3>
+                            {% if question.answer_set.first %}
+                                <p>{{ question.answer_set.first.text }}</p>
+                            {% else %}
+                                <p>No answers yet.</p>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Pagination controls -->
+            <div class="mt-4">
+                <span class="mr-2">Page:</span>
+                <div class="inline-flex">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="px-2 py-1 border bg-gray-200 rounded-l">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="px-2 py-1 border bg-gray-200">Previous</a>
+                    {% endif %}
+                    <span class="px-2 py-1 border bg-gray-200">{{ page_obj.number }}</span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="px-2 py-1 border bg-gray-200">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-2 py-1 border bg-gray-200 rounded-r">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

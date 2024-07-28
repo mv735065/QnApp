@@ -5,10 +5,23 @@
 {% block content %}
   <div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-md rounded-lg">
     <h1 class="text-2xl font-bold mb-6">
-      {% if answer_pk %}
-        Comment on Answer
+      {% if  answer_id %}
+        <!-- <h2>Comment on Answer</h2> -->
+         <span style="font-size: smaller; color:rgb(190, 208, 223);">Comment on Answer:</span>
+        {% if answer.description|length > 200 %}
+        <p class="mb-2">
+            <span class="short-answer">{{ answer.description|slice:":200" }}...</span>
+            <span class="full-answer hidden">{{ answer.description }}</span>
+            <a href="javascript:void(0);" class="text-blue-500 hover:underline read-more">Read More</a>
+        </p>
+    {% else %}
+        <p class="mb-2">{{ answer.description }}</p>
+    {% endif %}
       {% else %}
-        Comment on Question
+      <span style="font-size: smaller; color:rgb(190, 208, 223);">Comment on Question:</span>
+      <br>
+      <span >{{ question.title}}</span>
+        
       {% endif %}
     </h1>
     <form method="post">
@@ -29,6 +42,7 @@
         </div>
       {% endif %}
       <div class="mb-4">
+        
         <label for="id_content" class="block text-gray-700 text-sm font-bold mb-2">Content</label>
         {{ form.content|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
         <p class="text-gray-600 text-xs italic mt-1">{{ form.content.help_text }}</p>
@@ -40,4 +54,21 @@
       </div>
     </form>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const readMoreLinks = document.querySelectorAll('.read-more');
+    
+        readMoreLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                const shortAnswer = this.previousElementSibling;
+                const fullAnswer = shortAnswer.previousElementSibling;
+    
+                shortAnswer.classList.toggle('hidden');
+                fullAnswer.classList.toggle('hidden');
+                this.textContent = this.textContent === 'Read More' ? 'Read Less' : 'Read More';
+            });
+        });
+    });
+    </script>
 {% endblock %}
