@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import CustomLogoutView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.root_view, name='root'),
@@ -23,7 +25,7 @@ urlpatterns = [
     path('question/<int:question_pk>/answer/<int:answer_pk>/like/', views.like_answer, name='like_answer'),
     path('question/<int:question_pk>/answer/<int:answer_pk>/unlike/', views.unlike_answer, name='unlike_answer'),
 
-    path('question/<int:question_pk>/comment/', views.create_comment, name='create_comment'),
+    path('question/<int:question_pk>/comment/', views.handle_comment, name='create_comment'),
     path('question/<int:question_pk>/answer/<int:answer_pk>/comment/', views.create_comment_answer, name='create_comment_answer'),
 
     path('like_comment/<int:question_pk>/<int:comment_pk>/', views.like_comment, name='like_comment'),
@@ -35,14 +37,14 @@ urlpatterns = [
     path('question/<int:question_pk>/answer/<int:answer_pk>/allcomments',views.question_answer_comment,name='question_answer_comment'),
       
     path('delete_comment/<int:question_pk>/<int:comment_pk>/', views.delete_comment, name='delete_comment'),
-    path('edit_comment/<int:question_pk>/<int:comment_pk>/', views.edit_comment, name='edit_comment'),
+    path('edit_comment/<int:question_pk>/<int:comment_pk>/', views.handle_comment, name='edit_comment'),
 
     path('delete_comment/<int:question_pk>/<int:answer_pk>/<int:comment_pk>/',views.delete_comment, name='delete_comment_answer'),
-    path('edit_comment/<int:question_pk>/<int:answer_pk>/<int:comment_pk>/',views.edit_comment, name='edit_comment_answer'),
+    path('edit_comment/<int:question_pk>/<int:answer_pk>/<int:comment_pk>/',views.handle_comment, name='edit_comment_answer'),
 
     path('login/', views.custom_login, name='login'),
     # path('logout/', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
     path('signup/', views.signup, name='signup'),
     path('logout/', views.CustomLogoutView.as_view(), name='logout'),
     
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

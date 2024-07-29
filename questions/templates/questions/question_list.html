@@ -1,7 +1,9 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6 text-center">Questions</h1>
+<h1 class="text-2xl font-bold mb-8 mt-6 text-center p-4">
+  Questions
+</h1>
 <div class="flex">
   <div class="w-1/4 p-4 bg-gray-100 border-r border-gray-300 rounded-tr-lg shadow-md">
     <form method="get">
@@ -42,28 +44,30 @@
         {% for question in questions %}
           <li class="mx-auto w-11/12 p-4 border border-gray-300 rounded bg-white shadow-md">
             <div class="flex justify-between items-center">
-              <a href="{% url 'question_detail' question.pk %}" class="text-lg font-semibold text-gray-800 hover:text-blue-600">{{ question.title }}</a>
-              <small class="text-gray-500">{{ question.created_at }}</small>
+              <a href="{% url 'question_detail' question.pk %}" class="text-lg font-bold  text-blue-500 hover:text-blue-600">{{ question.title }}</a>
+              <small class="text-gray-500"> by {{ question.user.username }} {{ question.created_at }}</small>
             </div>
             <div class="mt-2 text-gray-600">
               <span>Number of answers: {{ question.answers.count }}</span>
             </div>
-            <div class="mt-2">
+            <div class="mt-2 flex justify-between items-center">
+              <div>
+                <span class="text-gray-600">Tags:
+                  {% for tag in question.tags.all %}
+                    <a href="{% url 'filter_by_tag'  tag.name %}" class="text-blue-500 hover:underline">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </span>
+              </div>
               <a href="{% url 'create_answer' question.pk %}#answer-form" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Answer</a>
-            </div>
-            <div class="mt-2">
-              <span class="text-gray-600">Tags:
-                {% for tag in question.tags.all %}
-                  <a href="#" class="text-blue-500 hover:underline">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-                {% endfor %}
-              </span>
             </div>
           </li>
         {% endfor %}
       {% else %}
-        <li>No questions yet</li>
+      <li class="mx-auto w-11/12 p-4 border border-gray-300 rounded bg-white shadow-md">
+        No questions yet</li>
       {% endif %}
     </ul>
   </div>
+
 </div>
 {% endblock %}

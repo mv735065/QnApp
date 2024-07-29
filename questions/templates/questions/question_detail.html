@@ -44,113 +44,254 @@
     border: none;
     outline: none;
 }
+
+/* Layout adjustments for the main content and sidebar */
+.main-content {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 0 10%;
+}
+
+.question-answer-section {
+    width: 67%;
+    padding-right: 10px;
+}
+
+.comments-section {
+    width: 33%;
+    padding-left: 10px;
+}
+
+/* Style for the cards */
+.card {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.card h2, .card h3 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    margin-bottom: 10px;
+}
+
+/* Styling for the buttons and links */
+.btn {
+    background-color: #1a73e8;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #155ab6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .question-answer-section, .comments-section {
+        width: 100%;
+        padding: 0;
+    }
+}
+
+/* Styles for the modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
 </style>
 {% endblock %}
 
 {% block title %}{{ question.title }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-10 p-4 bg-white shadow-md rounded-lg relative">
-    <h2 class="text-2xl font-bold mb-2">{{ question.title }}</h2>
-    <div class="text-sm text-gray-500 mb-4">Asked by {{ question.user.username }} on {{ question.created_at }}</div>
-    
-    <p class="mb-4 "><span class="text-sm text-gray-500 mb-4"> Description:</span>{{ question.description }}</p>
-    
-    <div class="absolute top-4 right-4">
-        {% if request.user == question.user %}
-        <a href="{% url 'edit_question' question.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
-        <span class="mx-2">|</span>
-        <a href="{% url 'delete_question' question.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
-        {% endif %}
-    </div>
-
-    <div class="flex justify-between items-center mb-4">
-        <div>
-            <a href="#" class="text-black px-4 py-2 rounded-md hover:bg-blue-700 mt-2 inline-block">💬 {{ question.comments.count }}</a>
-            <a href="{% url 'create_comment' question.pk %}" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-2 inline-block">Add Comment</a>
+<div class="max-w-6xl mx-auto main-content">
+    <div class="question-answer-section">
+        <div class="card relative"> 
+            <h2>{{ question.title }}</h2>
+            <div class="text-sm text-gray-500 mb-4">Asked by {{ question.user.username }} on {{ question.created_at }}</div>
+            
+            <p class="mb-4">{{ question.description }}</p>
+        
+            <!-- Display Images -->
+            <!-- <div class="mb-4">
+                {% if question.images.all %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {% for image in question.images.all %}
+                            <div class="border border-gray-200 rounded-md overflow-hidden">
+                                <img src="{{ image.image.url }}" alt="Question Image" class="w-full h-auto object-cover">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No images available.</p>
+                {% endif %}
+            </div> -->
+        
+            <div class="absolute top-4 right-4">
+                {% if request.user == question.user %}
+                <a href="{% url 'edit_question' question.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
+                <span class="mx-2">|</span>
+                <a href="{% url 'delete_question' question.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
+                {% endif %}
+            </div>
+        
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <a href="#" class="text-black px-4 py-2 rounded-md hover:bg-blue-700 mt-2 inline-block">💬 {{ question.comments.count }}</a>
+                    <a href="javascript:void(0);" class="btn mt-2 inline-block" id="openCommentModal">Add Comment</a>
+                </div>
+                <a href="{% url 'create_answer' question.pk %}" class="btn">Add Answer</a>
+            </div>
+        
+            <div class="flex items-center justify-between mt-4">
+                <div>
+                    <a href="{% url 'like_question' question.pk %}" class="text-blue-500 hover:underline">👍 Like</a> {{ question.total_likes }}
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'unlike_question' question.pk %}" class="text-red-500 hover:underline">👎 Unlike</a> {{ question.total_unlikes }}
+                </div>
+            </div>
         </div>
-        <a href="{% url 'create_answer' question.pk %}" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Add Answer</a>
+        
+        <div class="card">
+            <h3>Answers</h3>
+            <ul>
+                {% for answer in question.answers.all %}
+                <li class="mb-6 p-4 bg-white shadow-md rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-500">Answered by {{ answer.user.username }} on {{ answer.created_at }}</div>
+                    </div>
+                    {% if answer.description|length > 200 %}
+                        <p class="mb-2">
+                            <span class="short-answer">{{ answer.description|slice:":200" }}...</span>
+                            <span class="full-answer hidden">{{ answer.description }}</span>
+                            <a href="javascript:void(0);" class="text-blue-500 hover:underline read-more">Read More</a>
+                        </p>
+                    {% else %}
+                        <p class="mb-2">{{ answer.description }}</p>
+                    {% endif %}
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <a href="{% url 'like_answer' answer.question.pk answer.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ answer.total_likes }}
+                            <span class="mx-2">|</span>
+                            <a href="{% url 'unlike_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ answer.total_unlikes }}<span class="mx-2">|</span>
+                            <a href="{% url 'question_answer_comment' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Comments</a><span class="mx-2">|</span>
+                            <a href="{% url 'create_comment_answer' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Add Comment</a><span class="mx-2">|</span>
+                        </div>
+                        <div class="dropdown">
+                            <span class="dropbtn">⋮</span>
+                            <div class="dropdown-content">
+                                {% if request.user == answer.user %}
+                                <a href="{% url 'edit_answer' answer.question.pk answer.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
+                                <a href="{% url 'delete_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
-    <div class="flex items-center justify-between mt-4">
-        <div>
-            <a href="{% url 'like_question' question.pk %}" class="text-blue-500 hover:underline">👍 Like</a> {{ question.total_likes }}
-            <span class="mx-2">|</span>
-            <a href="{% url 'unlike_question' question.pk %}" class="text-red-500 hover:underline">👎 Unlike</a> {{ question.total_unlikes }}
+    <div class="comments-section">
+        <div class="card">
+            <h3>Comments</h3>
+            <ul>
+                {% for comment in question.comments.all %}
+                <li class="mb-4 p-4 bg-white shadow-md rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <div>{{ comment.content }}</div>
+                        <div class="text-sm text-gray-500">{{ comment.user.username }} on {{ comment.created_at }}</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <a href="{% url 'like_comment' comment.question.pk comment.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ comment.total_likes }}
+                            <span class="mx-2">|</span>
+                            <a href="{% url 'unlike_comment' comment.question.pk comment.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ comment.total_unlikes }}
+                        </div>
+                        <div class="dropdown">
+                            <span class="dropbtn">⋮</span>
+                            <div class="dropdown-content">
+                                {% if request.user == comment.user %}
+                                <a href="{% url 'edit_comment' comment.question.pk comment.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
+                                <a href="{% url 'delete_comment' comment.question.pk comment.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 </div>
 
-
-<div class="max-w-4xl mx-auto mt-10">
-    <h3 class="text-xl font-bold mb-4">Answers</h3>
-    <ul>
-        {% for answer in question.answers.all %}
-        <li class="mb-6 p-4 bg-white shadow-md rounded-lg">
-            <div class="flex items-center justify-between mb-2">
-                <div class="text-sm text-gray-500">Answered by {{ answer.user.username }} on {{ answer.created_at }}</div>
-            </div>
-            {% if answer.description|length > 200 %}
-                <p class="mb-2">
-                    <span class="short-answer">{{ answer.description|slice:":200" }}...</span>
-                    <span class="full-answer hidden">{{ answer.description }}</span>
-                    <a href="javascript:void(0);" class="text-blue-500 hover:underline read-more">Read More</a>
-                </p>
-            {% else %}
-                <p class="mb-2">{{ answer.description }}</p>
-            {% endif %}
-            <div class="flex justify-between items-center">
-                <div>
-                    <a href="{% url 'like_answer' answer.question.pk answer.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ answer.total_likes }}
-                    <span class="mx-2">|</span>
-                    <a href="{% url 'unlike_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ answer.total_unlikes }}<span class="mx-2">|</span>
-                    <a href="{% url 'question_answer_comment' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Comments</a><span class="mx-2">|</span>
-                    <a href="{% url 'create_comment_answer' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Add Comment</a><span class="mx-2">|</span>
-                </div>
-                <div class="dropdown">
-                    <span class="dropbtn">⋮</span>
-                    <div class="dropdown-content">
-                       
-                        {% if request.user == answer.user %}
-                        <a href="{% url 'edit_answer' answer.question.pk answer.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
-                        <a href="{% url 'delete_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
+<!-- Modal for adding comments -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeCommentModal">&times;</span>
+        <h2>Add Comment</h2>
+        <form action="{% url 'create_comment' question.pk %}" method="post">
+            {% csrf_token %}
+            <textarea name="content" rows="4" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Write your comment..."></textarea>
+            <button type="submit" class="btn mt-4">Submit</button>
+        </form>
+    </div>
 </div>
 
-<div class="max-w-4xl mx-auto mt-10">
-    <h3 class="text-xl font-bold mb-4">Comments</h3>
-    <ul>
-        {% for comment in question.comments.all %}
-        <li class="mb-4 p-4 bg-white shadow-md rounded-lg">
-            <div class="flex justify-between items-center mb-2">
-                <div>{{ comment.content }}</div>
-                <div class="text-sm text-gray-500">{{ comment.user.username }} on {{ comment.created_at }}</div>
-            </div>
-            <div class="flex justify-between items-center">
-                <div>
-                    <a href="{% url 'like_comment' comment.question.pk comment.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ comment.total_likes }}
-                    <span class="mx-2">|</span>
-                    <a href="{% url 'unlike_comment' comment.question.pk comment.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ comment.total_unlikes }}
-                </div>
-                <div class="dropdown">
-                    <span class="dropbtn">⋮</span>
-                    <div class="dropdown-content">
-                        {% if request.user == comment.user %}
-                        <a href="{% url 'edit_comment' comment.question.pk comment.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
-                        <a href="{% url 'delete_comment' comment.question.pk comment.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
+<div id="commentModal2" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeCommentModal">&times;</span>
+        <h2>Add Comment</h2>
+        <form action="{% url 'create_comment' question.pk %}" method="post">
+            {% csrf_token %}
+            <textarea name="content" rows="4" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Write your comment..."></textarea>
+            <button type="submit" class="btn mt-4">Submit</button>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -166,6 +307,24 @@ document.addEventListener('DOMContentLoaded', function () {
             fullAnswer.classList.toggle('hidden');
             this.textContent = this.textContent === 'Read More' ? 'Read Less' : 'Read More';
         });
+    });
+
+    const commentModal = document.getElementById('commentModal');
+    const openCommentModal = document.getElementById('openCommentModal');
+    const closeCommentModal = document.getElementById('closeCommentModal');
+
+    openCommentModal.addEventListener('click', function () {
+        commentModal.style.display = 'block';
+    });
+
+    closeCommentModal.addEventListener('click', function () {
+        commentModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target === commentModal) {
+            commentModal.style.display = 'none';
+        }
     });
 });
 </script>

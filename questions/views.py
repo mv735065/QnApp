@@ -18,13 +18,15 @@ def root_view(request):
 
 def home(request):
     questions = Question.objects.all()
-    paginator = Paginator(questions, 5)  # Show 5 questions per page
+    paginator = Paginator(questions,4)  # Show 5 questions per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+    tags = Tag.objects.all()
+
     context = {
         'page_obj': page_obj,
+        'tags':tags,
     }
     
     return render(request, 'questions/home.html', context)
@@ -95,7 +97,7 @@ def manage_question(request, pk=None):
         form = QuestionForm(request.POST or None, instance=question)
     else:
         # Creating a new question
-        form = QuestionForm(request.POST or None)
+        form = QuestionForm(request.POST or None , request.FILES)
 
     if request.method == 'POST':
         if form.is_valid():
@@ -104,6 +106,8 @@ def manage_question(request, pk=None):
             question.save()
             form.save_m2m()  # Save many-to-many data for the form
             return redirect('question_list')  # Redirect after successful save
+        
+        
 
     return render(request, 'questions/create_question.html', {'form': form})
 
@@ -156,7 +160,7 @@ def manage_answer(request, question_pk, answer_pk=None):
             return redirect('question_detail', pk=question_pk)
         form = AnswerForm(request.POST or None, instance=answer)
     else:
-        form = AnswerForm(request.POST or None)
+        form = AnswerForm(request.POST or None, request.FILES)
     
     # Handle form submission
     if request.method == 'POST':
@@ -177,17 +181,23 @@ from .models import Question, Answer, Comment
 from .forms import CommentForm
 
 @login_required
-def create_comment(request, question_pk, answer_pk=None):
+def handle_comment(request, question_pk, answer_pk=None, comment_pk=None):
+    print("handle")
     question = get_object_or_404(Question, pk=question_pk)
     if answer_pk:
         related_object = get_object_or_404(Answer, pk=answer_pk)
     else:
         related_object = question
-    
-    
-    
+
+    if comment_pk:
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        if request.user != comment.user:
+            return redirect('question_detail', pk=question_pk)
+    else:
+        comment = None
+
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.user = request.user
@@ -195,16 +205,23 @@ def create_comment(request, question_pk, answer_pk=None):
                 comment.answer = related_object
             else:
                 comment.question = related_object
-            
+
             comment.save()
-            return redirect('question_detail', pk=question_pk)
+            if comment_pk:
+                if answer_pk:
+                    return redirect('question_answer_comment', question_pk=question_pk, answer_pk=answer_pk)
+                return redirect('question_detail', pk=question_pk)
+            else:
+                return redirect('question_detail', pk=question_pk)
     else:
-        form = CommentForm()
-    return render(request, 'questions/create_comment.html', {
+        form = CommentForm(instance=comment)
+
+    template = 'questions/create_comment.html'
+    return render(request, template, {
         'form': form,
         'question': question
-       
     })
+
 
 
 @login_required
@@ -328,8 +345,10 @@ def unlike_comment(request, question_pk,answer_pk=None,comment_pk=None):
 # Filter questions by tag
 def filter_by_tag(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
-    questions = tag.question_set.all().order_by('-created_at')
-    return render(request, 'questions/question_list.html', {'questions': questions, 'tag': tag})
+    questions = tag.questions.all().order_by('-created_at')
+    tags = Tag.objects.all()
+
+    return render(request, 'questions/question_list.html', {'questions': questions, 'tag': tag,'tags':tags})
 
 
 def question_answer_comment(request,question_pk, answer_pk):
@@ -341,6 +360,8 @@ def question_answer_comment(request,question_pk, answer_pk):
     
 @login_required
 def edit_comment(request, question_pk, answer_pk=None, comment_pk=None):
+    print("edit")
+
     question = get_object_or_404(Question, pk=question_pk)
     comment = get_object_or_404(Comment, pk=comment_pk)
     
@@ -383,6 +404,7 @@ def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            print("error")
             user = form.save()
             login(request, user)
             return redirect('/home')  # Redirect to a home page or another page after signup

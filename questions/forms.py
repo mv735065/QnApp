@@ -21,6 +21,9 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['title', 'description', 'tags', 'created_at']
+        widgets = {
+            'created_at': forms.DateTimeInput(attrs={'type': 'datetime-local'})  # Customize input widget
+        }
 
     def clean(self):
         cleaned_data = super().clean()

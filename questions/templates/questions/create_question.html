@@ -1,13 +1,28 @@
 {% extends "base_generic.html" %}
 {% load custom_tags %}
 
+{% block stylesheet %}
+<style>
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10 columns with equal width */
+    gap: 8px; /* Adjust spacing between items */
+  }
+
+  .tag-item {
+    display: flex;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
   <div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-bold mb-6">Ask a Question</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <!-- Display form errors -->
-      {% if form.errors %}
+       {% if form.errors %}
         <div class="mb-4">
           <ul class="text-red-600">
             {% for field in form %}
@@ -20,7 +35,7 @@
             {% endfor %}
           </ul>
         </div>
-      {% endif %}
+      {% endif %} 
       <div class="mb-4">
         <label for="id_title" class="block text-gray-700 text-sm font-bold mb-2">Title</label>
         {{ form.title|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
@@ -31,14 +46,15 @@
       </div>
       <div class="mb-4">
         <label for="id_tags" class="block text-gray-700 text-sm font-bold mb-2">Tags</label>
-        <div class="space-y-2">
+        <div class="tag-grid">
           {% for tag in form.tags.field.queryset %}
-            <div class="flex items-center">
+            <div class="tag-item">
               <input type="checkbox" id="id_tags_{{ tag.id }}" name="tags" value="{{ tag.id }}" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
               <label for="id_tags_{{ tag.id }}" class="ml-2 text-gray-700 text-sm">{{ tag.name }}</label>
             </div>
           {% endfor %}
         </div>
+        
       </div>
       <div class="mb-4">
         <label for="id_title" class="block text-gray-700 text-sm font-bold mb-2">Created at</label>
@@ -51,6 +67,24 @@
         {{ form.new_tags|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
         <p class="text-gray-600 text-xs italic">{{ form.new_tags.help_text }}</p>
       </div>
+
+      <!-- <div class="mb-4">
+        <label for="id_images" class="block text-gray-700 text-sm font-bold mb-2">Images</label>
+        <input 
+            type="file" 
+            name="images" 
+            id="id_images" 
+            multiple 
+            class="hidden" 
+            onchange="updateFileName()"
+        />
+        <label for="id_images" class="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Choose Files
+        </label>
+        <p id="file-name" class="text-gray-600 text-xs italic mt-2"></p>
+        <p class="text-gray-600 text-xs italic">Upload images (you can select multiple files)</p>
+    </div> -->
+
       <div class="flex items-center justify-between">
         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           Submit
@@ -58,4 +92,12 @@
       </div>
     </form>
   </div>
+
+  <script>
+    function updateFileName() {
+        const input = document.getElementById('id_images');
+        const fileName = input.files.length > 0 ? Array.from(input.files).map(file => file.name).join(', ') : 'No files chosen';
+        document.getElementById('file-name').textContent = fileName;
+    }
+    </script>
 {% endblock %}

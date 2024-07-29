@@ -1,27 +1,68 @@
 {% extends "base_generic.html" %}
+
 {% block title %}{{ question.title }}{% endblock %}
+
 {% block content %}
-<h1></h1>
-<h2>Question: {{ question.title }}</h2>
-<h2>Answer:{{answer.description}}</h2>
-<h3> Comments:</h3>
- <ul>
-   
-                    {% for comment in comments %}
-                        <li>
-                            <p>{{ comment.content }} - {{ comment.user.username }} on {{ comment.created_at }}</p>
-                            
-                        </li>
-                        <span><a href="{% url 'like_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Upvote</a> {{ comment.total_likes }}
-                            <a href="{% url 'unlike_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Downvote</a>{{ comment.total_unlikes }}
-                            {% if request.user == comment.user %}
-                    <a href="{% url 'edit_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Edit_Comment</a>
-                    <a href="{% url 'delete_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}">Delete_Comment</a>
+<div class="max-w-4xl mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-4">Question: {{ question.title }}</h2>
+    <div class="p-4 bg-gray-100 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold mb-2">Answer:</h2>
+        <p class="text-gray-700">{{ answer.description }}</p>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-4">Comments:</h3>
+        <ul class="space-y-4">
+            {% for comment in comments %}
+            <li class="p-4 bg-gray-100 rounded-lg shadow-sm">
+                <p class="text-gray-700 mb-2">{{ comment.content }} - <span class="text-sm text-gray-500">{{ comment.user.username }} on {{ comment.created_at }}</span></p>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'like_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> <span  class="mx-2">{{ comment.total_likes }}</span> <span class="mx-2">|</span>
+                    <a href="{% url 'unlike_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> <span  class="mx-2">{{ comment.total_unlikes }}</span><span class="mx-2">|</span>
+                    {% if request.user == comment.user %}
+                    <a href="{% url 'edit_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}" class="text-green-500 hover:underline">✏️ Edit</a><span class="mx-2">|</span>
+                    <a href="{% url 'delete_comment_answer' comment.answer.question.pk comment.answer.pk comment.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a><span class="mx-2">|</span>
+                    {% endif %}
+                </div>
+            </li>
+            <!-- <li class="mb-6 p-4 bg-white shadow-md rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm text-gray-500">Answered by {{ answer.user.username }} on {{ answer.created_at }}</div>
+                </div>
+                {% if answer.description|length > 200 %}
+                    <p class="mb-2">
+                        <span class="short-answer">{{ answer.description|slice:":200" }}...</span>
+                        <span class="full-answer hidden">{{ answer.description }}</span>
+                        <a href="javascript:void(0);" class="text-blue-500 hover:underline read-more">Read More</a>
+                    </p>
+                {% else %}
+                    <p class="mb-2">{{ answer.description }}</p>
                 {% endif %}
-                        </span>
-                    {% endfor %}
-                </ul>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <a href="{% url 'like_answer' answer.question.pk answer.pk %}" class="text-blue-500 hover:underline">👍 Upvote</a> {{ answer.total_likes }}
+                        <span class="mx-2">|</span>
+                        <a href="{% url 'unlike_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">👎 Downvote</a> {{ answer.total_unlikes }}<span class="mx-2">|</span>
+                        <a href="{% url 'question_answer_comment' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Comments</a><span class="mx-2">|</span>
+                        <a href="{% url 'create_comment_answer' answer.question.id answer.id %}" class="text-blue-500 hover:underline">Add Comment</a><span class="mx-2">|</span>
+                    </div>
+                    <div class="dropdown">
+                        <span class="dropbtn">⋮</span>
+                        <div class="dropdown-content">
+                            {% if request.user == answer.user %}
+                            <a href="{% url 'edit_answer' answer.question.pk answer.pk %}" class="text-green-500 hover:underline">✏️ Edit</a>
+                            <a href="{% url 'delete_answer' answer.question.pk answer.pk %}" class="text-red-500 hover:underline">🗑️ Delete</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </li> -->
+            {% endfor %}
+        </ul>
+    </div>
 
-    <a href="{% url 'create_comment_answer' question.pk  answer.pk %}"> <button type="submit">Add Comment</button></a>
-
+    <a href="{% url 'create_comment_answer' question.pk answer.pk %}" class="inline-block">
+        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">Add Comment</button>
+    </a>
+</div>
 {% endblock %}

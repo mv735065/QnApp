@@ -10,14 +10,18 @@ class Tag(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     tags = models.ManyToManyField(Tag, related_name='questions')
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now,blank=True,null=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.ManyToManyField(User, related_name='liked_question', blank=True)
     unlikes = models.ManyToManyField(User, related_name='unliked_question', blank=True)
-
+    # images = models.ManyToManyField('Image', blank=True) 
+    def save(self, *args, **kwargs):
+        if not self.created_at:
+            self.created_at = timezone.now()
+        super().save(*args, **kwargs)
     def total_likes(self):
         return self.likes.count()
 
@@ -38,7 +42,10 @@ class Answer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     likes = models.ManyToManyField(User, related_name='liked_answers')
     unlikes = models.ManyToManyField(User, related_name='unliked_answers')
-    
+    # images = models.ManyToManyField('Image', blank=True) 
+
+   
+
     def count(self):
         question = Question.objects.get(id=self.id)
         return question.answers.count()
@@ -73,3 +80,6 @@ class Comment(models.Model):
         return self.content[:50]
 
 
+class Image(models.Model):
+    image = models.ImageField(upload_to='images/')
+    created_at = models.DateTimeField(auto_now_add=True)
