@@ -399,19 +399,28 @@ def delete_comment(request, question_pk, answer_pk=None, comment_pk=None):
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.contrib import messages
+
 
 def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            print("error")
-            user = form.save()
-            login(request, user)
-            return redirect('/home')  # Redirect to a home page or another page after signup
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
 
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+
+        if password == confirm_password:
+            try:
+                user = User.objects.create_user(username=username, password=password)
+                user.save()
+                login(request, user)
+                return redirect('/home')
+            except:
+                messages.error(request, 'Username already exists.')
+        else:
+            messages.error(request, 'Passwords do not match.')
+    
+    return render(request, 'registration/signup.html')
 
 
 from django.contrib.auth import logout
