@@ -43,12 +43,14 @@ def searchbar(request):
 # List of all questions
 from django.shortcuts import render, get_object_or_404
 from .models import Question, Tag
+from django.db.models import Q
 
 def question_list(request, tag_name=None):
     tag_names = request.GET.getlist('tags')
     selected_year = request.GET.get('year')
     sort_by = request.GET.get('sort', 'date')  # Default sorting by date
     search_query = request.GET.get('search', '')  # Search query
+    display = request.GET.get('display', 'questions')  # Display questions or answers
 
     if tag_name:
         tag = get_object_or_404(Tag, name=tag_name)
@@ -66,13 +68,21 @@ def question_list(request, tag_name=None):
     
     # Search filter
     if search_query:
-        questions = questions.filter(title__icontains=search_query)
+        questions = questions.filter(
+            Q(title__icontains=search_query) )
+            
+       
+        answers = Answer.objects.filter( Q(description__icontains=search_query) ).distinct()
 
+    else:
+        answers = Answer.objects.none()
     # Sorting
     if sort_by == 'date':
         questions = questions.order_by('-created_at')  # Sort by creation date, descending
+        answers = answers.order_by('-created_at')
     elif sort_by == 'date_asc':
         questions = questions.order_by('created_at')  # Sort by creation date, ascending
+        answers = answers.order_by('created_at')
 
     # Get all unique years for the dropdown
     years = Question.objects.dates('created_at', 'year').distinct()
@@ -80,12 +90,14 @@ def question_list(request, tag_name=None):
 
     return render(request, 'questions/question_list.html', {
         'questions': questions,
+        'answers': answers,
         'tags': tags,
         'selected_tags': tag_names,
         'sort_by': sort_by,
         'years': years,
         'selected_year': selected_year,
         'search_query': search_query,
+        'display': display,
         'current_tag': tag_name,
     })
 
@@ -114,7 +126,7 @@ def manage_question(request, pk=None):
             question.user = request.user
             question.save()
             form.save_m2m()  # Save many-to-many data for the form
-            return redirect('question_list')  # Redirect after successful save
+            return redirect('question_detail',question.pk)  # Redirect after successful save
         
         
 

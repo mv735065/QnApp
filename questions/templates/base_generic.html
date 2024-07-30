@@ -7,7 +7,19 @@
     <meta charset="utf-8">
     <title>{% block title %}Qa App{% endblock %}</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    {% block stylesheet %}{% endblock %}
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+
+    {% block stylesheet %}
+    
+    {% endblock %}
 </head>
 <body>
 <nav class="bg-white shadow">
@@ -15,12 +27,12 @@
         <div class="flex h-16 justify-between items-center">
             <div class="flex px-2 lg:px-0">
                 <div class="flex flex-shrink-0 items-center">
-                    <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
+                   <a href="{% url 'home' %}"><img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company"></a> 
                 </div>
                 <div class="hidden lg:ml-6 lg:flex lg:space-x-8">
                     <a href="{% url 'home' %}" class="inline-flex items-center border-b-2 {% active_url request 'home' %} px-1 pt-1 text-sm font-medium">Home</a>
                     <a href="{% url 'question_list' %}" class="inline-flex items-center border-b-2 {% active_url request 'question_list' %} px-1 pt-1 text-sm font-medium">Questions</a>
-                    <a href="{% url 'create_question' %}" class="inline-flex items-center border-b-2 {% active_url request 'create_question' %} px-1 pt-1 text-sm font-medium">Add Question</a>
+                    <!-- <a href="{% url 'create_question' %}" class="inline-flex items-center border-b-2 {% active_url request 'create_question' %} px-1 pt-1 text-sm font-medium">Add Question</a> -->
                 </div>
             </div>
             <form method="get" action="{% url 'question_list' %}" class="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end">

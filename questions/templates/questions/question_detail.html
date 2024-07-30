@@ -150,10 +150,20 @@
 <div class="max-w-6xl mx-auto main-content">
     <div class="question-answer-section">
         <div class="card relative"> 
-            <h2>{{ question.title }}</h2>
+            <h2 class="text-black font-bold">{{ question.title }}</h2>
             <div class="text-sm text-gray-500 mb-4">Asked by {{ question.user.username }} on {{ question.created_at }}</div>
             
-            <p class="mb-4">{{ question.description }}</p>
+            
+            {% if question.description|length > 200 %}
+            <p class="mb-2">
+                <span class="text-sm text-gray-400 p-1 mb-4">Description:</span>
+                <span class="short-answer">{{ question.description|slice:":200" }}...</span>
+                <span class="full-answer hidden">{{ question.description }}</span>
+                <a href="javascript:void(0);" class="text-blue-500 hover:underline read-more">Read More</a>
+            </p>
+        {% else %}
+            <p class="mb-2" > <span class="text-sm text-gray-400 p-1 mb-4">Description:</span>{{ question.description }}</p>
+        {% endif %}
         
             <!-- Display Images -->
             <!-- <div class="mb-4">

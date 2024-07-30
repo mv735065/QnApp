@@ -17,6 +17,7 @@
 {% endblock %}
 
 {% block content %}
+  {% if user.is_authenticated %}
   <div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-bold mb-6">Ask a Question</h1>
     <form method="post" enctype="multipart/form-data">
@@ -92,6 +93,11 @@
       </div>
     </form>
   </div>
+  {% else %}
+  <script>
+    window.location.href = "{% url 'login' %}?next={{ request.path }}";
+  </script>
+  {% endif %}
 
   <script>
     function updateFileName() {
