@@ -41,17 +41,24 @@ def searchbar(request):
 
 
 # List of all questions
-def question_list(request):
+from django.shortcuts import render, get_object_or_404
+from .models import Question, Tag
+
+def question_list(request, tag_name=None):
     tag_names = request.GET.getlist('tags')
     selected_year = request.GET.get('year')
     sort_by = request.GET.get('sort', 'date')  # Default sorting by date
     search_query = request.GET.get('search', '')  # Search query
 
-    # Filter by tags
-    if tag_names:
-        questions = Question.objects.filter(tags__name__in=tag_names).distinct()
+    if tag_name:
+        tag = get_object_or_404(Tag, name=tag_name)
+        questions = tag.questions.all()
     else:
         questions = Question.objects.all()
+
+    # Filter by tags
+    if tag_names:
+        questions = questions.filter(tags__name__in=tag_names).distinct()
 
     # Filter by year
     if selected_year:
@@ -78,8 +85,10 @@ def question_list(request):
         'sort_by': sort_by,
         'years': years,
         'selected_year': selected_year,
-        'search_query': search_query
+        'search_query': search_query,
+        'current_tag': tag_name,
     })
+
 
 # Create a question
 from django.shortcuts import get_object_or_404, redirect, render
