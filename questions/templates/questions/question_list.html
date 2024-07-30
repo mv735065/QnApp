@@ -5,7 +5,7 @@
   Questions
 </h1>
 <div class="flex">
-  <div class="w-1/4 p-4 bg-gray-100 border-r border-gray-300 rounded-tr-lg shadow-md">
+  <div class="w-1/4 p-4 bg-gray-100 border-r border-gray-300 rounded-tr-lg shadow-md ">
     <form method="get">
       <div class="mb-4">
         <label for="search" class="block mb-1">Search:</label>
@@ -36,8 +36,13 @@
         </select>
       </div>
       <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Filter</button>
+      
+      <a href="{%  url 'question_list' %}"class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Reset</a>
     </form>
+    
   </div>
+    
+
   <div class="w-3/4 p-4 ml-10">
     <ul class="space-y-6">
       {% if questions %}
