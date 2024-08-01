@@ -17,8 +17,8 @@ def root_view(request):
     return redirect('home')
 
 def home(request):
-    questions = Question.objects.all()
-    paginator = Paginator(questions,4)  # Show 5 questions per page
+    questions = Question.objects.all().order_by('-created_at')
+    paginator = Paginator(questions,5)  # Show 5 questions per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -100,7 +100,13 @@ def question_list(request, tag_name=None):
         'display': display,
         'current_tag': tag_name,
     })
+# Filter questions by tag
+def filter_by_tag(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    questions = tag.questions.all().order_by('-created_at')
+    tags = Tag.objects.all()
 
+    return render(request, 'questions/question_list.html', {'questions': questions, 'tag': tag,'tags':tags ,'display': 'questions'} )
 
 # Create a question
 from django.shortcuts import get_object_or_404, redirect, render
@@ -363,13 +369,7 @@ def unlike_comment(request, question_pk,answer_pk=None,comment_pk=None):
     return redirect('question_detail', pk=question_pk)
 
 
-# Filter questions by tag
-def filter_by_tag(request, tag_name):
-    tag = get_object_or_404(Tag, name=tag_name)
-    questions = tag.questions.all().order_by('-created_at')
-    tags = Tag.objects.all()
 
-    return render(request, 'questions/question_list.html', {'questions': questions, 'tag': tag,'tags':tags})
 
 
 def question_answer_comment(request,question_pk, answer_pk):
